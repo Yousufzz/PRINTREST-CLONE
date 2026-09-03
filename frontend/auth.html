@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In & Register — PinAI</title>
+  <meta name="description" content="Sign in or create a new PinAI account to curate and save your visual inspiration." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📌</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Apple OS Glassmorphism Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar__inner">
+      <div class="navbar__left">
+        <a href="index.html" class="navbar__logo">
+          <div class="navbar__logo-icon">P</div>
+          <span>PinAI</span>
+        </a>
+
+        <div class="navbar__nav">
+          <a href="index.html" class="navbar__nav-link">Feed</a>
+          <a href="search.html" class="navbar__nav-link">Search</a>
+          <a href="saved.html" class="navbar__nav-link">Saved</a>
+          <a href="about.html" class="navbar__nav-link">About &amp; API</a>
+        </div>
+      </div>
+
+      <div class="navbar__search">
+        <span class="navbar__search-icon">🔍</span>
+        <input
+          type="text"
+          class="navbar__search-input"
+          id="navSearchInput"
+          placeholder="Search photos..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Far Right Corner Container -->
+      <div class="navbar__corner">
+        <a href="settings.html" class="navbar__icon-btn" title="Settings">⚙️</a>
+        <div id="navbarAuthSlot" class="navbar__auth-slot"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Auth Page Content -->
+  <main class="main" style="display: flex; align-items: center; justify-content: center; min-height: 75vh;">
+    <div class="apple-modal" style="transform: none; position: static; box-shadow: var(--shadow-apple); margin: 40px auto;">
+      <div class="auth-box">
+        <div class="auth-box__logo">
+          <div class="navbar__logo-icon" style="width: 52px; height: 52px; font-size: 1.6rem; margin: 0 auto 14px;">P</div>
+          <h1 class="auth-box__title" style="font-size: 1.5rem;">Join PinAI</h1>
+          <p class="auth-box__subtitle">Your personal space for visual inspiration</p>
+        </div>
+
+        <!-- Apple OS Segmented Control -->
+        <div class="segmented-control" id="standaloneAuthTabs">
+          <button class="segmented-btn active" data-tab="login">Sign In</button>
+          <button class="segmented-btn" data-tab="register">Register</button>
+        </div>
+
+        <!-- Sign In Form -->
+        <form class="auth-form" id="pageLoginForm">
+          <div class="auth-field">
+            <label class="auth-label">Username</label>
+            <input type="text" class="auth-input" id="pLoginUsername" placeholder="your username" required autocomplete="username" />
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">Password</label>
+            <input type="password" class="auth-input" id="pLoginPassword" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="apple-btn apple-btn--primary apple-btn--block" style="margin-top: 14px;">
+            Sign In
+          </button>
+        </form>
+
+        <!-- Register Form -->
+        <form class="auth-form hidden" id="pageRegisterForm">
+          <div class="auth-field">
+            <label class="auth-label">Full Name</label>
+            <input type="text" class="auth-input" id="pRegName" placeholder="e.g. Alex Rivera" required />
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">Username</label>
+            <input type="text" class="auth-input" id="pRegUsername" placeholder="choose a unique username" required autocomplete="username" />
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">Password</label>
+            <input type="password" class="auth-input" id="pRegPassword" placeholder="at least 6 characters" required autocomplete="new-password" />
+          </div>
+          <button type="submit" class="apple-btn apple-btn--primary apple-btn--block" style="margin-top: 14px;">
+            Create New Account
+          </button>
+        </form>
+
+        <p class="auth-footer-note">
+          Secured on local Node backend &bull; Zero tracking
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Full Apple OS Footer (Rendered on non-feed pages) -->
+  <footer class="apple-footer">
+    <div class="apple-footer__inner">
+      <div class="apple-footer__top">
+        <div class="apple-footer__logo">
+          <div class="navbar__logo-icon" style="width: 28px; height: 28px; font-size: 0.95rem;">P</div>
+          <span>PinAI</span>
+        </div>
+        <div class="apple-footer__links">
+          <a href="index.html" class="apple-footer__link">Feed</a>
+          <a href="search.html" class="apple-footer__link">Search</a>
+          <a href="saved.html" class="apple-footer__link">Saved</a>
+          <a href="about.html" class="apple-footer__link">About</a>
+          <a href="settings.html" class="apple-footer__link">Settings</a>
+          <a href="auth.html" class="apple-footer__link">Account</a>
+        </div>
+      </div>
+      <div class="apple-footer__bottom">
+        <div>&copy; 2026 PinAI Platform &bull; Apple OS Security</div>
+        <div>
+          Powered by
+          <a href="https://unsplash.com/?utm_source=pinai&utm_medium=referral" target="_blank" rel="noopener" style="text-decoration: underline; color: var(--text-secondary);">Unsplash</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/modal.js"></script>
+
+  <script>
+    // Tab switching for standalone page
+    document.querySelectorAll('#standaloneAuthTabs .segmented-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#standaloneAuthTabs .segmented-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const isLogin = btn.dataset.tab === 'login';
+        document.getElementById('pageLoginForm').classList.toggle('hidden', !isLogin);
+        document.getElementById('pageRegisterForm').classList.toggle('hidden', isLogin);
+      });
+    });
+
+    // Form handlers with redirect to feed
+    document.getElementById('pageLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const u = document.getElementById('pLoginUsername').value.trim();
+      const p = document.getElementById('pLoginPassword').value;
+      const res = await Auth.login(u, p);
+      if (res.success) {
+        setTimeout(() => window.location.href = 'index.html', 600);
+      }
+    });
+
+    document.getElementById('pageRegisterForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const n = document.getElementById('pRegName').value.trim();
+      const u = document.getElementById('pRegUsername').value.trim();
+      const p = document.getElementById('pRegPassword').value;
+      const res = await Auth.register(u, p, n);
+      if (res.success) {
+        setTimeout(() => window.location.href = 'index.html', 600);
+      }
+    });
+  </script>
+
+</body>
+</html>

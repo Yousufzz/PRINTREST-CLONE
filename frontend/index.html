@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PinAI — Apple OS Visual Discovery</title>
+  <meta name="description" content="PinAI is a modern Apple OS styled visual discovery platform powered by Unsplash. Discover, search, and curate stunning photography." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📌</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Apple OS Glassmorphism Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar__inner">
+      <div class="navbar__left">
+        <a href="index.html" class="navbar__logo">
+          <div class="navbar__logo-icon">P</div>
+          <span>PinAI</span>
+        </a>
+
+        <div class="navbar__nav">
+          <a href="index.html" class="navbar__nav-link active">Feed</a>
+          <a href="search.html" class="navbar__nav-link">Search</a>
+          <a href="saved.html" class="navbar__nav-link">Saved</a>
+          <a href="about.html" class="navbar__nav-link">About &amp; API</a>
+        </div>
+      </div>
+
+      <div class="navbar__search">
+        <span class="navbar__search-icon">🔍</span>
+        <input
+          type="text"
+          class="navbar__search-input"
+          id="navSearchInput"
+          placeholder="Search millions of photos..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Far Right Corner Container -->
+      <div class="navbar__corner">
+        <a href="settings.html" class="navbar__icon-btn" title="Settings">⚙️</a>
+        <div id="navbarAuthSlot" class="navbar__auth-slot"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 3D Animated PINAI Hero Stage (Scrolls into feed) -->
+  <section class="hero3d-section" id="hero3dContainer">
+    <div class="hero3d-overlay">
+      <span class="hero3d-tagline">Visual Discovery Powered by Unsplash</span>
+      <button class="hero3d-pill-btn hero3d-bounce" id="heroExploreBtn">
+        <span>Scroll to Explore Feed</span>
+        <span>↓</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Main Feed Content -->
+  <main class="main" id="feedMain">
+    <div class="container">
+
+      <!-- Dynamic Category Chips -->
+      <div class="categories" id="categoriesBar">
+        <!-- Populated by feed.js from /api/topics -->
+      </div>
+
+      <!-- Masonry Grid -->
+      <div class="masonry-grid" id="feedGrid">
+        <!-- Pin cards rendered here by feed.js -->
+      </div>
+
+      <!-- Infinite Scroll Sentinel -->
+      <div class="scroll-sentinel" id="scrollSentinel"></div>
+
+      <!-- Loading Spinner -->
+      <div class="loading-section hidden" id="feedLoading">
+        <div class="spinner"></div>
+        <span class="loading-text">Loading more inspiration...</span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- NO FOOTER ON FEED PAGE: Preserves endless infinite scrolling per requirement -->
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/hero3d.js"></script>
+  <script src="js/feed.js"></script>
+
+</body>
+</html>

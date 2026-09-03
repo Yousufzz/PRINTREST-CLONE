@@ -1,0 +1,7 @@
+# Ignore all user credentials and database files in this folder
+*.json
+!users.example.json
+
+# Keep directory tracking
+!.gitignore
+!.gitkeep

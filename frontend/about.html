@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Architecture & How It Works — PinAI</title>
+  <meta name="description" content="Learn how PinAI integrates with the Unsplash API: backend proxy architecture, dynamic image delivery, hotlinking, download tracking, and attribution rules." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📌</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Apple OS Glassmorphism Navbar with Corner Sign In -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar__inner">
+      <div class="navbar__left">
+        <a href="index.html" class="navbar__logo">
+          <div class="navbar__logo-icon">P</div>
+          <span>PinAI</span>
+        </a>
+
+        <div class="navbar__nav">
+          <a href="index.html" class="navbar__nav-link">Feed</a>
+          <a href="search.html" class="navbar__nav-link">Search</a>
+          <a href="saved.html" class="navbar__nav-link">Saved</a>
+          <a href="about.html" class="navbar__nav-link active">API Architecture</a>
+        </div>
+      </div>
+
+      <div class="navbar__search">
+        <span class="navbar__search-icon">🔍</span>
+        <input
+          type="text"
+          class="navbar__search-input"
+          id="navSearchInput"
+          placeholder="Search photos..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Far Right Corner Container -->
+      <div class="navbar__corner">
+        <a href="settings.html" class="navbar__icon-btn" title="Settings">⚙️</a>
+        <div id="navbarAuthSlot" class="navbar__auth-slot"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="container" style="max-width: 1060px;">
+
+      <!-- Hero Section -->
+      <section class="about-hero">
+        <div class="api-badge">Unsplash Developer Documentation & Architecture</div>
+        <h1 class="about-hero__title" style="font-size: 2.8rem; margin-top: 10px;">How PinAI Works With Unsplash API</h1>
+        <p class="about-hero__desc">
+          PinAI provides a modern Pinterest-style interface powered entirely by the official <strong>Unsplash REST API</strong>.
+          Every photograph, category, and search query flows dynamically through a secure Node.js proxy layer with zero local image storage.
+        </p>
+      </section>
+
+      <!-- Section 1: The 5-Step Architecture Flow -->
+      <section style="margin-bottom: 50px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px;">
+          🔄 5-Step Data Flow Architecture
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+          How image requests travel from your browser to Unsplash's cloud and back in milliseconds.
+        </p>
+
+        <div class="api-flow-grid">
+          <!-- Step 1 -->
+          <div class="api-flow-step">
+            <div class="api-flow-step__number">1</div>
+            <h3 class="api-flow-step__title">User Action</h3>
+            <p class="api-flow-step__text">
+              The user loads the Feed, scrolls for infinite pagination, or enters a keyword like "minimalist architecture" into the search bar.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="api-flow-step">
+            <div class="api-flow-step__number">2</div>
+            <h3 class="api-flow-step__title">Browser &rarr; Node Proxy</h3>
+            <p class="api-flow-step__text">
+              The browser executes a lightweight native <code>fetch()</code> request to the local backend proxy at <code>/api/photos</code> or <code>/api/search</code>.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="api-flow-step">
+            <div class="api-flow-step__number">3</div>
+            <h3 class="api-flow-step__title">Security & Caching</h3>
+            <p class="api-flow-step__text">
+              Express checks its in-memory TTL cache (5-min lifetime). If uncached, it attaches the private <code>Authorization: Client-ID</code> key and calls <code>api.unsplash.com</code>.
+            </p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="api-flow-step">
+            <div class="api-flow-step__number">4</div>
+            <h3 class="api-flow-step__title">JSON Payload Return</h3>
+            <p class="api-flow-step__text">
+              Unsplash returns photo metadata (dimensions, BlurHash, CDN URLs, creator profile links). The proxy strips bloat and returns a clean JSON payload.
+            </p>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="api-flow-step">
+            <div class="api-flow-step__number">5</div>
+            <h3 class="api-flow-step__title">Hotlinking & Render</h3>
+            <p class="api-flow-step__text">
+              Frontend dynamically builds the Pinterest masonry grid. Photos are loaded directly from <code>images.unsplash.com</code> without consuming local disk space.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Core Endpoints Explained -->
+      <section style="margin-bottom: 50px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px;">
+          📡 Backend API Endpoints Reference
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+          All endpoints provided by our Node.js Express server (`backend/server.js`):
+        </p>
+
+        <!-- Endpoint 1: Photos -->
+        <div class="api-endpoint-card">
+          <div class="api-endpoint-card__header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="api-method-badge">GET</span>
+              <span class="api-path">/api/photos</span>
+            </div>
+            <span class="api-target">&rarr; https://api.unsplash.com/photos</span>
+          </div>
+          <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+            Fetches the latest editorial photographs from the Unsplash curated catalog. Supports <code>page</code>, <code>per_page</code>, and <code>order_by</code> parameters for infinite scrolling.
+          </p>
+          <pre class="api-code-snippet"><code>// Response (Sample Pin Object)
+[
+  {
+    "id": "zt3lGL94U4E",
+    "width": 3000,
+    "height": 3058,
+    "blur_hash": "LTI;kk?^$*tR^kbvM{RjR*WBe.of",
+    "urls": {
+      "small": "https://images.unsplash.com/photo-1779896412261-988da02d1307?w=400...",
+      "regular": "https://images.unsplash.com/photo-1779896412261-988da02d1307?w=1080..."
+    },
+    "user": {
+      "name": "Sandisk",
+      "username": "sandisk",
+      "links": { "html": "https://unsplash.com/@sandisk" }
+    },
+    "likes": 42
+  }
+]</code></pre>
+        </div>
+
+        <!-- Endpoint 2: Search -->
+        <div class="api-endpoint-card">
+          <div class="api-endpoint-card__header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="api-method-badge">GET</span>
+              <span class="api-path">/api/search?q=:query&amp;page=:n</span>
+            </div>
+            <span class="api-target">&rarr; https://api.unsplash.com/search/photos</span>
+          </div>
+          <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+            Executes keyword search through Unsplash's neural visual search and community tag index. Includes live 400ms debounce to minimize unnecessary network calls.
+          </p>
+          <pre class="api-code-snippet"><code>// Request: GET /api/search?q=cyberpunk&page=1
+{
+  "total": 8420,
+  "total_pages": 421,
+  "results": [ /* Array of matching photo objects */ ]
+}</code></pre>
+        </div>
+
+        <!-- Endpoint 3: Topics -->
+        <div class="api-endpoint-card">
+          <div class="api-endpoint-card__header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="api-method-badge">GET</span>
+              <span class="api-path">/api/topics</span>
+            </div>
+            <span class="api-target">&rarr; https://api.unsplash.com/topics</span>
+          </div>
+          <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+            Retrieves featured editorial topics (e.g. <em>Wallpapers</em>, <em>3D Renders</em>, <em>Nature</em>, <em>Architecture</em>) to dynamically populate the Feed page category chips bar.
+          </p>
+        </div>
+
+        <!-- Endpoint 4: Download Tracking -->
+        <div class="api-endpoint-card">
+          <div class="api-endpoint-card__header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="api-method-badge">GET</span>
+              <span class="api-path">/api/photos/:id/download</span>
+            </div>
+            <span class="api-target">&rarr; https://api.unsplash.com/photos/:id/download</span>
+          </div>
+          <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+            <strong>Mandatory Unsplash Guideline:</strong> Whenever a user clicks "Download", this endpoint is invoked to report a download event to Unsplash, incrementing the photographer's verified metrics and returning a high-res direct download link.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 3: Official Unsplash Guidelines & Compliance -->
+      <section style="margin-bottom: 50px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px;">
+          🛡️ Unsplash API Guidelines &amp; Developer Rules
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+          How PinAI rigorously satisfies every item in the Unsplash Developer Production Checklist:
+        </p>
+
+        <div class="compliance-grid">
+          <!-- Rule 1: Hotlinking -->
+          <div class="compliance-card">
+            <div class="compliance-card__icon">🔗</div>
+            <h3 class="compliance-card__title">1. Hotlink Images Directly</h3>
+            <p class="compliance-card__desc">
+              Unsplash requires image URLs to be embedded directly into <code>&lt;img src&gt;</code> without storing them on your own servers. This ensures proper CDN caching and view metric attribution for creators.
+            </p>
+          </div>
+
+          <!-- Rule 2: Photographer Credit -->
+          <div class="compliance-card">
+            <div class="compliance-card__icon">👤</div>
+            <h3 class="compliance-card__title">2. Creator Attribution</h3>
+            <p class="compliance-card__desc">
+              Every pin card and detail modal explicitly displays the photographer's full name, avatar, and referral link back to their Unsplash profile with proper UTM parameters (<code>utm_source=pinai</code>).
+            </p>
+          </div>
+
+          <!-- Rule 3: Trigger Downloads -->
+          <div class="compliance-card">
+            <div class="compliance-card__icon">📥</div>
+            <h3 class="compliance-card__title">3. Trigger Download Events</h3>
+            <p class="compliance-card__desc">
+              When users download an image, PinAI notifies <code>photo.links.download_location</code> through our proxy to accurately track community popularity.
+            </p>
+          </div>
+
+          <!-- Rule 4: Secret Key Protection -->
+          <div class="compliance-card">
+            <div class="compliance-card__icon">🔐</div>
+            <h3 class="compliance-card__title">4. Private API Key Security</h3>
+            <p class="compliance-card__desc">
+              The <code>UNSPLASH_KEY</code> is stored strictly in server-side <code>.env</code>. Frontend JavaScript only communicates with <code>/api/*</code> and never has access to secret tokens.
+            </p>
+          </div>
+
+          <!-- Rule 5: Rate Limiting -->
+          <div class="compliance-card">
+            <div class="compliance-card__icon">⏱️</div>
+            <h3 class="compliance-card__title">5. Rate Limiting &amp; Caching</h3>
+            <p class="compliance-card__desc">
+              Demo applications are restricted to 50 requests/hour. PinAI uses an in-memory 5-minute TTL cache (capped at 100 entries) to prevent redundant queries and avoid 429 rate limit errors.
+            </p>
+          </div>
+
+          <!-- Rule 6: Distinct Branding -->
+          <div class="compliance-card">
+            <div class="compliance-card__icon">🎨</div>
+            <h3 class="compliance-card__title">6. Distinct Visual Identity</h3>
+            <p class="compliance-card__desc">
+              PinAI does not clone Unsplash's trademark or logo. It uses an original Apple OS inspired dark glassmorphic design and Pinterest masonry grid layout.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Live System Status Widget -->
+      <section class="settings-card" style="margin-bottom: 40px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 style="font-size: 1.2rem; font-weight: 800;">⚡ Live Backend &amp; API Connectivity Status</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">
+              Real-time diagnostics from your running Node.js server
+            </p>
+          </div>
+          <button class="apple-btn apple-btn--secondary" id="checkApiBtn">
+            Refresh Status
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 20px;" id="apiStatusGrid">
+          <div style="background: var(--bg-surface-2); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <div style="font-size: 0.76rem; color: var(--text-tertiary); text-transform: uppercase;">Express Server</div>
+            <div style="font-size: 1.05rem; font-weight: 700; color: #34c759; margin-top: 4px;" id="statusServer">● Online (:5000)</div>
+          </div>
+          <div style="background: var(--bg-surface-2); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <div style="font-size: 0.76rem; color: var(--text-tertiary); text-transform: uppercase;">Unsplash Source</div>
+            <div style="font-size: 1.05rem; font-weight: 700; color: #0071e3; margin-top: 4px;">api.unsplash.com</div>
+          </div>
+          <div style="background: var(--bg-surface-2); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <div style="font-size: 0.76rem; color: var(--text-tertiary); text-transform: uppercase;">In-Memory Cache</div>
+            <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-top: 4px;" id="statusCache">Active</div>
+          </div>
+          <div style="background: var(--bg-surface-2); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <div style="font-size: 0.76rem; color: var(--text-tertiary); text-transform: uppercase;">CDN Image Delivery</div>
+            <div style="font-size: 1.05rem; font-weight: 700; color: #34c759; margin-top: 4px;">Hotlinked Imgix</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Full Apple OS Footer (Rendered on non-feed pages) -->
+  <footer class="apple-footer">
+    <div class="apple-footer__inner">
+      <div class="apple-footer__top">
+        <div class="apple-footer__logo">
+          <div class="navbar__logo-icon" style="width: 28px; height: 28px; font-size: 0.95rem;">P</div>
+          <span>PinAI</span>
+        </div>
+        <div class="apple-footer__links">
+          <a href="index.html" class="apple-footer__link">Feed</a>
+          <a href="search.html" class="apple-footer__link">Search</a>
+          <a href="saved.html" class="apple-footer__link">Saved</a>
+          <a href="about.html" class="apple-footer__link">API Architecture</a>
+          <a href="settings.html" class="apple-footer__link">Settings</a>
+          <a href="auth.html" class="apple-footer__link">Account</a>
+        </div>
+      </div>
+      <div class="apple-footer__bottom">
+        <div>&copy; 2026 PinAI Platform &bull; Unsplash API Integration Documentation</div>
+        <div>
+          Powered by
+          <a href="https://unsplash.com/?utm_source=pinai&utm_medium=referral" target="_blank" rel="noopener" style="text-decoration: underline; color: var(--text-secondary);">Unsplash</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/modal.js"></script>
+
+  <script>
+    // Live API status checker
+    async function updateStatus() {
+      const serverEl = document.getElementById('statusServer');
+      const cacheEl = document.getElementById('statusCache');
+      try {
+        const res = await fetch('/api/health');
+        if (res.ok) {
+          const data = await res.json();
+          serverEl.textContent = '● Online (:5000)';
+          serverEl.style.color = '#34c759';
+          cacheEl.textContent = `${data.cache_size || 0} cached routes`;
+        } else {
+          serverEl.textContent = '● Degraded';
+          serverEl.style.color = '#ff9500';
+        }
+      } catch {
+        serverEl.textContent = '● Offline';
+        serverEl.style.color = '#ff3b30';
+      }
+    }
+
+    document.getElementById('checkApiBtn')?.addEventListener('click', () => {
+      updateStatus();
+      showToast('Live API status refreshed', 'info');
+    });
+
+    document.addEventListener('DOMContentLoaded', updateStatus);
+  </script>
+
+</body>
+</html>

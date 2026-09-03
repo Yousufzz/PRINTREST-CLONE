@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System Settings — PinAI</title>
+  <meta name="description" content="Customize your PinAI themes, accent colors, layout density, and account preferences." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📌</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Apple OS Glassmorphism Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar__inner">
+      <div class="navbar__left">
+        <a href="index.html" class="navbar__logo">
+          <div class="navbar__logo-icon">P</div>
+          <span>PinAI</span>
+        </a>
+
+        <div class="navbar__nav">
+          <a href="index.html" class="navbar__nav-link">Feed</a>
+          <a href="search.html" class="navbar__nav-link">Search</a>
+          <a href="saved.html" class="navbar__nav-link">Saved</a>
+          <a href="about.html" class="navbar__nav-link">About &amp; API</a>
+        </div>
+      </div>
+
+      <div class="navbar__search">
+        <span class="navbar__search-icon">🔍</span>
+        <input
+          type="text"
+          class="navbar__search-input"
+          id="navSearchInput"
+          placeholder="Search photos..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Far Right Corner Container -->
+      <div class="navbar__corner">
+        <a href="settings.html" class="navbar__icon-btn active" title="Settings">⚙️</a>
+        <div id="navbarAuthSlot" class="navbar__auth-slot"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Settings Content -->
+  <main class="main" id="settingsPageRoot">
+    <div class="settings-container">
+
+      <!-- Header -->
+      <header class="settings-header">
+        <h1 class="settings-header__title">System Settings</h1>
+        <p class="settings-header__subtitle">Personalize your themes, appearance, grid behavior, and account</p>
+      </header>
+
+      <!-- 1. Appearance & Theme -->
+      <section class="settings-card">
+        <h2 class="settings-card__title">🎨 Appearance & Themes</h2>
+        <p class="settings-card__desc">Choose an Apple OS curated color scheme</p>
+
+        <div class="theme-cards-grid">
+          <!-- OLED Dark -->
+          <div class="theme-card active" data-theme="dark">
+            <div class="theme-card__preview" style="background: #000; color: #fff;">OLED Black</div>
+            <div class="theme-card__name">Dark Minimal</div>
+          </div>
+
+          <!-- Midnight Blue -->
+          <div class="theme-card" data-theme="midnight">
+            <div class="theme-card__preview" style="background: #080c16; color: #60a5fa;">Midnight Blue</div>
+            <div class="theme-card__name">Apple Midnight</div>
+          </div>
+
+          <!-- Space Gray -->
+          <div class="theme-card" data-theme="spacegray">
+            <div class="theme-card__preview" style="background: #131416; color: #d1d5db;">Space Gray</div>
+            <div class="theme-card__name">macOS Space Gray</div>
+          </div>
+
+          <!-- Titanium Silver -->
+          <div class="theme-card" data-theme="titanium">
+            <div class="theme-card__preview" style="background: #1a1a1e; color: #f3f4f6;">Titanium</div>
+            <div class="theme-card__name">Titanium Frost</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 6px;">Accent Color</h3>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">Applies to buttons, links, active pills, and glows</p>
+
+          <div class="accent-swatches">
+            <button class="accent-swatch active" data-color="#E60023" style="background: #E60023;" title="Pinterest Red"></button>
+            <button class="accent-swatch" data-color="#FF3B30" style="background: #FF3B30;" title="Apple Red"></button>
+            <button class="accent-swatch" data-color="#0071E3" style="background: #0071E3;" title="Apple Blue"></button>
+            <button class="accent-swatch" data-color="#AF52DE" style="background: #AF52DE;" title="Cyber Purple"></button>
+            <button class="accent-swatch" data-color="#34C759" style="background: #34C759;" title="Mint Green"></button>
+            <button class="accent-swatch" data-color="#FF9500" style="background: #FF9500;" title="Sunset Amber"></button>
+            <button class="accent-swatch" data-color="#FF2D55" style="background: #FF2D55;" title="Flamingo Pink"></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Grid & 3D Experience -->
+      <section class="settings-card">
+        <h2 class="settings-card__title">🧊 Display & Spatial 3D Experience</h2>
+        <p class="settings-card__desc">Adjust masonry column density and interactive 3D hero</p>
+
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 10px;">Masonry Grid Density</h3>
+          <div class="segmented-control" style="max-width: 380px;">
+            <button class="segmented-btn density-btn" data-density="compact">Compact (6 Col)</button>
+            <button class="segmented-btn density-btn active" data-density="standard">Standard (5 Col)</button>
+            <button class="segmented-btn density-btn" data-density="relaxed">Relaxed (4 Col)</button>
+          </div>
+        </div>
+
+        <div class="apple-dropdown__divider"></div>
+
+        <div class="apple-switch-row">
+          <div>
+            <div style="font-weight: 600; font-size: 0.92rem;">3D Animated PINAI Intro</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">
+              Renders the WebGL 3D typography with starlight particles and camera swoop on the Feed page
+            </div>
+          </div>
+          <label class="apple-switch">
+            <input type="checkbox" id="hero3dSwitch" checked />
+            <span class="apple-slider"></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- 3. Account & Identity -->
+      <section class="settings-card">
+        <h2 class="settings-card__title">👤 Account & Profile</h2>
+        <p class="settings-card__desc">Manage your PinAI user profile and sessions</p>
+
+        <div id="settingsUserCard">
+          <!-- Populated by settings.js -->
+        </div>
+      </section>
+
+      <!-- 4. Data & Reset -->
+      <section class="settings-card">
+        <h2 class="settings-card__title">💾 Storage & Utilities</h2>
+        <p class="settings-card__desc">Export your visual library or reset preferences</p>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+          <button class="apple-btn apple-btn--secondary" id="exportDataBtn">
+            📥 Export Saved Pins (.JSON)
+          </button>
+          <button class="apple-btn apple-btn--danger" id="resetSettingsBtn">
+            ↺ Reset All Preferences
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Full Apple OS Footer (Rendered on non-feed pages) -->
+  <footer class="apple-footer">
+    <div class="apple-footer__inner">
+      <div class="apple-footer__top">
+        <div class="apple-footer__logo">
+          <div class="navbar__logo-icon" style="width: 28px; height: 28px; font-size: 0.95rem;">P</div>
+          <span>PinAI</span>
+        </div>
+        <div class="apple-footer__links">
+          <a href="index.html" class="apple-footer__link">Feed</a>
+          <a href="search.html" class="apple-footer__link">Search</a>
+          <a href="saved.html" class="apple-footer__link">Saved</a>
+          <a href="about.html" class="apple-footer__link">About</a>
+          <a href="settings.html" class="apple-footer__link">Settings</a>
+          <a href="auth.html" class="apple-footer__link">Account</a>
+        </div>
+      </div>
+      <div class="apple-footer__bottom">
+        <div>&copy; 2026 PinAI Platform &bull; macOS System Experience</div>
+        <div>
+          Powered by
+          <a href="https://unsplash.com/?utm_source=pinai&utm_medium=referral" target="_blank" rel="noopener" style="text-decoration: underline; color: var(--text-secondary);">Unsplash</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/modal.js"></script>
+
+</body>
+</html>
