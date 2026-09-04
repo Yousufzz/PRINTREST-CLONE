@@ -1,14 +1,14 @@
 {
-  "name": "pinai",
+  "name": "pinterest-clone",
   "version": "1.0.0",
-  "description": "PinAI — Pinterest clone powered by Unsplash API",
+  "description": "Pinterest Clone — visual discovery platform powered by Unsplash API",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js"
   },
   "keywords": ["pinterest", "unsplash", "masonry", "gallery"],
-  "author": "PinAI",
+  "author": "Pinterest Clone",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.7.0",

@@ -87,7 +87,7 @@ app.listen(PORT, () => {
   console.log(`
   ╔═══════════════════════════════════════════╗
   ║                                           ║
-  ║   🎯 PinAI Server Running                 ║
+  ║   🎯 Pinterest Clone Server Running       ║
   ║   📡 http://localhost:${PORT}               ║
   ║   🔑 API Key: ${process.env.UNSPLASH_KEY ? '✅ Loaded' : '❌ MISSING'}              ║
   ║                                           ║
