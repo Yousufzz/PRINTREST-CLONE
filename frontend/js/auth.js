@@ -43,7 +43,7 @@ const Auth = (function () {
 
       localStorage.setItem(TOKEN_KEY, data.token);
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-      showToast(`Welcome to PinAI, ${data.user.name}!`, 'success');
+      showToast(`Welcome to Pinterest, ${data.user.name}!`, 'success');
       updateNavbarUI();
       return { success: true, user: data.user };
     } catch (err) {
@@ -160,7 +160,7 @@ const Auth = (function () {
               <span class="apple-dropdown__icon">⚙️</span> System Settings
             </a>
             <a href="about.html" class="apple-dropdown__item">
-              <span class="apple-dropdown__icon">ℹ️</span> About PinAI
+              <span class="apple-dropdown__icon">ℹ️</span> About Pinterest
             </a>
             <div class="apple-dropdown__divider"></div>
             <button class="apple-dropdown__item apple-dropdown__item--danger" id="logoutBtn">
@@ -220,7 +220,7 @@ const Auth = (function () {
         <div class="auth-box">
           <div class="auth-box__logo">
             <div class="navbar__logo-icon" style="width: 48px; height: 48px; font-size: 1.5rem; margin: 0 auto 12px;">P</div>
-            <h2 class="auth-box__title">Welcome to PinAI</h2>
+            <h2 class="auth-box__title">Welcome to Pinterest</h2>
             <p class="auth-box__subtitle">Your personal space for visual inspiration</p>
           </div>
 
@@ -265,7 +265,7 @@ const Auth = (function () {
           </form>
 
           <p class="auth-footer-note">
-            Protected by PinAI &bull; No cookies or trackers
+            Protected by Pinterest &bull; No cookies or trackers
           </p>
         </div>
       </div>

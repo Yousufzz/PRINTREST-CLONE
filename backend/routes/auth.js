@@ -87,7 +87,7 @@ router.post('/register', (req, res) => {
       username: cleanUsername,
       name: displayName,
       avatar,
-      bio: 'PinAI visual curator',
+      bio: 'Pinterest visual curator',
       passwordHash,
       salt,
       createdAt: new Date().toISOString(),

@@ -148,7 +148,7 @@ const Settings = (function () {
             <h3>Not Signed In</h3>
             <p>Sign in to sync your visual collection across devices and customize your profile.</p>
             <button class="apple-btn apple-btn--primary" id="settingsSignInBtn" style="margin-top: 12px;">
-              Sign In to PinAI
+              Sign In to Pinterest
             </button>
           </div>
         `;

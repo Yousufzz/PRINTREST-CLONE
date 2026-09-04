@@ -1,7 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════
-   PinAI — 3D Animated Hero Intro (Three.js WebGL)
-   Features illuminated 3D metallic "PINAI" typography with
-   floating starlight particles and camera zoom on scroll into feed.
+   Pinterest Clone — Next-Gen 3D Animated Hero (Three.js WebGL)
+   Features:
+   - Sculpted 3D "PINTEREST" kinetic wordmark with liquid wave oscillation
+   - Signature 3D floating ruby Pinterest Pin badge with metallic chrome needle
+   - Orbiting translucent 3D glass inspiration cards (Pins)
+   - 450 iridescent stardust nebula particles with crimson/gold/blue glow
+   - Responsive aspect-ratio auto-scaling for mobile & desktop
+   - Interactive mouse parallax & smooth scroll swoop into masonry feed
    ═══════════════════════════════════════════════════════════════ */
 
 (function () {
@@ -16,65 +21,86 @@
     return;
   }
 
-  let scene, camera, renderer, textGroup, particles;
+  let scene, camera, renderer;
+  let textGroup, pinBadge, cardsGroup, particles;
   let mouseX = 0, mouseY = 0;
   let targetRotationX = 0, targetRotationY = 0;
   let scrollProgress = 0;
+  const floatingCards = [];
 
   function init() {
     const width = container.clientWidth;
     const height = container.clientHeight;
 
-    // 1. Scene
+    // 1. Scene setup with deep cinematic atmospheric fog
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x050508, 0.015);
+    scene.fog = new THREE.FogExp2(0x06060a, 0.012);
 
     // 2. Camera
     camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 32);
+    camera.position.set(0, 0, 36);
 
-    // 3. Renderer
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    // 3. WebGL Renderer
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1.3;
     container.appendChild(renderer.domElement);
 
-    // 4. Studio Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // 4. Lighting System
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(ambientLight);
 
-    const dirLight1 = new THREE.DirectionalLight(0xff3b30, 2.5); // Apple Red
-    dirLight1.position.set(20, 20, 20);
-    scene.add(dirLight1);
+    // Pinterest signature crimson key light
+    const redLight = new THREE.DirectionalLight(0xe60023, 3.2);
+    redLight.position.set(24, 20, 22);
+    scene.add(redLight);
 
-    const dirLight2 = new THREE.DirectionalLight(0x0071e3, 2.0); // Apple Blue
-    dirLight2.position.set(-20, -10, 15);
-    scene.add(dirLight2);
+    // Cool rim light for Apple-style metallic reflection
+    const blueLight = new THREE.DirectionalLight(0x0071e3, 2.4);
+    blueLight.position.set(-25, -12, 18);
+    scene.add(blueLight);
 
-    const pointLight = new THREE.PointLight(0xffffff, 3, 50);
-    pointLight.position.set(0, 0, 15);
-    scene.add(pointLight);
+    // Warm specular fill light
+    const goldLight = new THREE.DirectionalLight(0xffb800, 1.2);
+    goldLight.position.set(0, -20, 15);
+    scene.add(goldLight);
 
-    // 5. Build 3D "PINAI" Letters using procedural geometry
+    // Center focal point light
+    const centerLight = new THREE.PointLight(0xffffff, 2.5, 60);
+    centerLight.position.set(0, 2, 16);
+    scene.add(centerLight);
+
+    // 5. Build 3D "PINTEREST" Letters
     textGroup = new THREE.Group();
-    buildLetters();
+    buildPinterestLetters();
     scene.add(textGroup);
 
-    // 6. Floating Particles
+    // 6. Build 3D Signature Pinterest Pin Badge
+    buildPinBadge();
+
+    // 7. Build Floating 3D Glass Inspiration Cards
+    cardsGroup = new THREE.Group();
+    buildFloatingCards();
+    scene.add(cardsGroup);
+
+    // 8. Swirling Starlight Particle Nebula
     createParticles();
 
-    // 7. Event Listeners
+    // 9. Initial Scale Adjustment for Screen Size
+    adjustScale();
+
+    // 10. Event Listeners
     window.addEventListener('resize', onWindowResize);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('scroll', onWindowScroll, { passive: true });
 
-    // Explore Button click
+    // Scroll to explore button
     const exploreBtn = document.getElementById('heroExploreBtn');
     if (exploreBtn) {
       exploreBtn.addEventListener('click', () => {
-        const feedTop = container.offsetHeight - 50;
+        const feedTop = container.offsetHeight - 40;
         window.scrollTo({ top: feedTop, behavior: 'smooth' });
       });
     }
@@ -82,100 +108,242 @@
     animate();
   }
 
-  // ─── Procedural 3D Letter Construction ─────────────────────────
-  function buildLetters() {
-    const material = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      metalness: 0.85,
-      roughness: 0.15,
+  // ─── Procedural 3D "PINTEREST" Kinetic Wordmark ───────────────────
+  function buildPinterestLetters() {
+    const silverMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xf8f9fa,
+      metalness: 0.88,
+      roughness: 0.16,
       clearcoat: 1.0,
       clearcoatRoughness: 0.1,
-      reflectivity: 0.9,
-      transmission: 0.2,
-      ior: 1.5
+      reflectivity: 0.95,
+      transmission: 0.12,
+      ior: 1.52
     });
 
-    const letterDepth = 1.6;
-    const barRadius = 0.55;
+    const barRadius = 0.46;
 
-    // Helper: create cylinder bar
-    function createCylinder(length, rx = 0, ry = 0, rz = 0, x = 0, y = 0, z = 0) {
-      const geo = new THREE.CylinderGeometry(barRadius, barRadius, length, 24);
-      const mesh = new THREE.Mesh(geo, material);
+    function createBar(len, rx = 0, ry = 0, rz = 0, x = 0, y = 0, z = 0) {
+      const geo = new THREE.CylinderGeometry(barRadius, barRadius, len, 24);
+      const mesh = new THREE.Mesh(geo, silverMaterial);
       mesh.rotation.set(rx, ry, rz);
       mesh.position.set(x, y, z);
       return mesh;
     }
 
-    // Helper: create torus arc
-    function createArc(radius, tube, arc, x = 0, y = 0, z = 0, rz = 0) {
-      const geo = new THREE.TorusGeometry(radius, tube, 20, 36, arc);
-      const mesh = new THREE.Mesh(geo, material);
+    function createArc(r, tube, arc, x = 0, y = 0, z = 0, rz = 0) {
+      const geo = new THREE.TorusGeometry(r, tube, 20, 36, arc);
+      const mesh = new THREE.Mesh(geo, silverMaterial);
       mesh.rotation.z = rz;
       mesh.position.set(x, y, z);
       return mesh;
     }
 
-    // ─── Letter 'P' (center ~ -10)
+    // 1. 'P' (center -13.6)
     const pGroup = new THREE.Group();
-    pGroup.position.x = -10.5;
-    pGroup.add(createCylinder(7, 0, 0, 0, -1.2, 0, 0)); // vertical stem
-    pGroup.add(createArc(1.8, barRadius, Math.PI, -1.2, 1.7, 0, -Math.PI / 2)); // loop
+    pGroup.position.x = -13.6;
+    pGroup.add(createBar(6.2, 0, 0, 0, -0.7, 0, 0));
+    pGroup.add(createArc(1.4, barRadius, Math.PI, -0.7, 1.5, 0, -Math.PI / 2));
     textGroup.add(pGroup);
 
-    // ─── Letter 'I' (center ~ -5)
-    const i1Group = new THREE.Group();
-    i1Group.position.x = -5.2;
-    i1Group.add(createCylinder(7, 0, 0, 0, 0, 0, 0)); // stem
-    i1Group.add(createCylinder(2.6, 0, 0, Math.PI / 2, 0, 3.2, 0)); // top serif
-    i1Group.add(createCylinder(2.6, 0, 0, Math.PI / 2, 0, -3.2, 0)); // bottom serif
-    textGroup.add(i1Group);
+    // 2. 'I' (center -10.2)
+    const iGroup = new THREE.Group();
+    iGroup.position.x = -10.2;
+    iGroup.add(createBar(6.2, 0, 0, 0, 0, 0, 0));
+    iGroup.add(createBar(2.2, 0, 0, Math.PI / 2, 0, 2.9, 0));
+    iGroup.add(createBar(2.2, 0, 0, Math.PI / 2, 0, -2.9, 0));
+    textGroup.add(iGroup);
 
-    // ─── Letter 'N' (center ~ 0)
+    // 3. 'N' (center -6.8)
     const nGroup = new THREE.Group();
-    nGroup.position.x = 0;
-    nGroup.add(createCylinder(7, 0, 0, 0, -1.8, 0, 0)); // left stem
-    nGroup.add(createCylinder(7, 0, 0, 0, 1.8, 0, 0)); // right stem
-    nGroup.add(createCylinder(7.8, 0, 0, -0.48, 0, 0, 0)); // diagonal
+    nGroup.position.x = -6.8;
+    nGroup.add(createBar(6.2, 0, 0, 0, -1.05, 0, 0));
+    nGroup.add(createBar(6.2, 0, 0, 0, 1.05, 0, 0));
+    nGroup.add(createBar(6.5, 0, 0, -0.34, 0, 0, 0));
     textGroup.add(nGroup);
 
-    // ─── Letter 'A' (center ~ 5.5)
-    const aGroup = new THREE.Group();
-    aGroup.position.x = 5.5;
-    aGroup.add(createCylinder(7.2, 0, 0, 0.28, -1.1, 0, 0)); // left leg
-    aGroup.add(createCylinder(7.2, 0, 0, -0.28, 1.1, 0, 0)); // right leg
-    aGroup.add(createCylinder(2.2, 0, 0, Math.PI / 2, 0, -0.6, 0)); // crossbar
-    textGroup.add(aGroup);
+    // 4. 'T' (center -3.4)
+    const t1Group = new THREE.Group();
+    t1Group.position.x = -3.4;
+    t1Group.add(createBar(6.0, 0, 0, 0, 0, -0.2, 0));
+    t1Group.add(createBar(3.0, 0, 0, Math.PI / 2, 0, 2.8, 0));
+    textGroup.add(t1Group);
 
-    // ─── Letter 'I' (center ~ 10.5)
-    const i2Group = new THREE.Group();
-    i2Group.position.x = 10.8;
-    i2Group.add(createCylinder(7, 0, 0, 0, 0, 0, 0));
-    i2Group.add(createCylinder(2.6, 0, 0, Math.PI / 2, 0, 3.2, 0));
-    i2Group.add(createCylinder(2.6, 0, 0, Math.PI / 2, 0, -3.2, 0));
-    textGroup.add(i2Group);
+    // 5. 'E' (center 0.0)
+    const e1Group = new THREE.Group();
+    e1Group.position.x = 0.0;
+    e1Group.add(createBar(6.2, 0, 0, 0, -0.9, 0, 0));
+    e1Group.add(createBar(2.2, 0, 0, Math.PI / 2, 0.1, 2.9, 0));
+    e1Group.add(createBar(1.7, 0, 0, Math.PI / 2, -0.15, 0.0, 0));
+    e1Group.add(createBar(2.2, 0, 0, Math.PI / 2, 0.1, -2.9, 0));
+    textGroup.add(e1Group);
+
+    // 6. 'R' (center 3.4)
+    const rGroup = new THREE.Group();
+    rGroup.position.x = 3.4;
+    rGroup.add(createBar(6.2, 0, 0, 0, -0.8, 0, 0));
+    rGroup.add(createArc(1.35, barRadius, Math.PI, -0.8, 1.5, 0, -Math.PI / 2));
+    rGroup.add(createBar(3.4, 0, 0, -0.58, 0.35, -1.45, 0));
+    textGroup.add(rGroup);
+
+    // 7. 'E' (center 6.8)
+    const e2Group = new THREE.Group();
+    e2Group.position.x = 6.8;
+    e2Group.add(createBar(6.2, 0, 0, 0, -0.9, 0, 0));
+    e2Group.add(createBar(2.2, 0, 0, Math.PI / 2, 0.1, 2.9, 0));
+    e2Group.add(createBar(1.7, 0, 0, Math.PI / 2, -0.15, 0.0, 0));
+    e2Group.add(createBar(2.2, 0, 0, Math.PI / 2, 0.1, -2.9, 0));
+    textGroup.add(e2Group);
+
+    // 8. 'S' (center 10.2)
+    const sGroup = new THREE.Group();
+    sGroup.position.x = 10.2;
+    sGroup.add(createBar(1.8, 0, 0, Math.PI / 2, 0, 2.9, 0));
+    sGroup.add(createBar(1.6, 0, 0, 0, -0.85, 2.05, 0));
+    sGroup.add(createBar(1.8, 0, 0, Math.PI / 2, 0, 0.0, 0));
+    sGroup.add(createBar(1.6, 0, 0, 0, 0.85, -1.05, 0));
+    sGroup.add(createBar(1.8, 0, 0, Math.PI / 2, 0, -2.9, 0));
+    textGroup.add(sGroup);
+
+    // 9. 'T' (center 13.6)
+    const t2Group = new THREE.Group();
+    t2Group.position.x = 13.6;
+    t2Group.add(createBar(6.0, 0, 0, 0, 0, -0.2, 0));
+    t2Group.add(createBar(3.0, 0, 0, Math.PI / 2, 0, 2.8, 0));
+    textGroup.add(t2Group);
   }
 
-  // ─── Floating Star Particles ───────────────────────────────────
+  // ─── Signature 3D Pinterest Red Pin Emblem ─────────────────────────
+  function buildPinBadge() {
+    pinBadge = new THREE.Group();
+
+    // Glossy Pinterest Ruby Head
+    const rubyMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xe60023,
+      emissive: 0x660010,
+      metalness: 0.5,
+      roughness: 0.12,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.05,
+      reflectivity: 0.98
+    });
+
+    // Outer spherical cap
+    const sphereGeo = new THREE.SphereGeometry(1.6, 32, 32);
+    const sphereMesh = new THREE.Mesh(sphereGeo, rubyMaterial);
+    sphereMesh.scale.set(1.1, 1.1, 0.55);
+    pinBadge.add(sphereMesh);
+
+    // Chrome needle
+    const chromeMaterial = new THREE.MeshStandardMaterial({
+      color: 0xe8ecf1,
+      metalness: 0.95,
+      roughness: 0.1
+    });
+    const needleGeo = new THREE.ConeGeometry(0.24, 3.6, 24);
+    const needleMesh = new THREE.Mesh(needleGeo, chromeMaterial);
+    needleMesh.rotation.x = Math.PI;
+    needleMesh.position.set(0, -2.4, 0);
+    pinBadge.add(needleMesh);
+
+    // White embossed 'P' inside the badge
+    const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const pStem = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 1.5, 16), whiteMat);
+    pStem.position.set(-0.25, 0.05, 0.45);
+    pinBadge.add(pStem);
+
+    const pLoop = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.14, 16, 24, Math.PI), whiteMat);
+    pLoop.rotation.z = -Math.PI / 2;
+    pLoop.position.set(-0.25, 0.38, 0.45);
+    pinBadge.add(pLoop);
+
+    // Soft local glow light
+    const badgeLight = new THREE.PointLight(0xe60023, 2.5, 15);
+    badgeLight.position.set(0, 0, 3);
+    pinBadge.add(badgeLight);
+
+    pinBadge.position.set(0, 5.8, 2);
+    scene.add(pinBadge);
+  }
+
+  // ─── Floating 3D Glass Inspiration Cards (Pins in Space) ───────────
+  function buildFloatingCards() {
+    const cardData = [
+      { x: -19, y: 4.5, z: -7, rx: 0.12, ry: 0.25, color: 0xe60023 },
+      { x: 19, y: 5.5, z: -6, rx: -0.15, ry: -0.22, color: 0x0071e3 },
+      { x: -16, y: -6.0, z: -5, rx: 0.18, ry: 0.15, color: 0xffb800 },
+      { x: 17, y: -5.5, z: -8, rx: -0.12, ry: -0.2, color: 0xff2a6d },
+      { x: -9, y: 8.5, z: -11, rx: 0.1, ry: 0.1, color: 0x34c759 },
+      { x: 9, y: 8.0, z: -10, rx: -0.1, ry: -0.15, color: 0xaf52de }
+    ];
+
+    cardData.forEach((cd, i) => {
+      const cardGroup = new THREE.Group();
+      cardGroup.position.set(cd.x, cd.y, cd.z);
+      cardGroup.rotation.set(cd.rx, cd.ry, 0);
+
+      // Glass body
+      const cardGeo = new THREE.BoxGeometry(3.0, 4.4, 0.08);
+      const cardMat = new THREE.MeshPhysicalMaterial({
+        color: 0x14141e,
+        metalness: 0.1,
+        roughness: 0.2,
+        transmission: 0.7,
+        opacity: 0.75,
+        transparent: true,
+        clearcoat: 1.0
+      });
+      const cardMesh = new THREE.Mesh(cardGeo, cardMat);
+      cardGroup.add(cardMesh);
+
+      // Glowing border edge
+      const edgeGeo = new THREE.EdgesGeometry(cardGeo);
+      const edgeMat = new THREE.LineBasicMaterial({
+        color: cd.color,
+        transparent: true,
+        opacity: 0.45
+      });
+      const edgeMesh = new THREE.LineSegments(edgeGeo, edgeMat);
+      cardGroup.add(edgeMesh);
+
+      cardsGroup.add(cardGroup);
+      floatingCards.push({
+        group: cardGroup,
+        baseX: cd.x,
+        baseY: cd.y,
+        baseZ: cd.z,
+        baseRx: cd.rx,
+        baseRy: cd.ry,
+        speed: 0.8 + i * 0.25
+      });
+    });
+  }
+
+  // ─── Swirling Starlight Nebula Particles ───────────────────────────
   function createParticles() {
-    const count = 350;
+    const count = 450;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 80;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 60;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 60;
+      // Cylindrical/galaxy distribution around the letters
+      const radius = 10 + Math.random() * 28;
+      const angle = Math.random() * Math.PI * 2;
+      positions[i * 3] = Math.cos(angle) * radius;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 45;
+      positions[i * 3 + 2] = Math.sin(angle) * radius * 0.6 + (Math.random() - 0.5) * 20;
 
-      // Color variation (Apple red, electric blue, soft white)
-      const choice = Math.random();
-      if (choice < 0.3) {
-        colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.23; colors[i * 3 + 2] = 0.19;
-      } else if (choice < 0.6) {
-        colors[i * 3] = 0.0; colors[i * 3 + 1] = 0.44; colors[i * 3 + 2] = 0.89;
+      // Color variation: Pinterest Red, Coral Rose, Electric Blue, Diamond White
+      const r = Math.random();
+      if (r < 0.35) {
+        colors[i * 3] = 0.90; colors[i * 3 + 1] = 0.0; colors[i * 3 + 2] = 0.14; // #E60023
+      } else if (r < 0.6) {
+        colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.25; colors[i * 3 + 2] = 0.45; // Coral Rose
+      } else if (r < 0.8) {
+        colors[i * 3] = 0.0; colors[i * 3 + 1] = 0.44; colors[i * 3 + 2] = 0.89; // Cyan Blue
       } else {
-        colors[i * 3] = 0.9; colors[i * 3 + 1] = 0.9; colors[i * 3 + 2] = 1.0;
+        colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.95; colors[i * 3 + 2] = 0.85; // Pure White/Gold
       }
     }
 
@@ -183,10 +351,10 @@
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const particleMaterial = new THREE.PointsMaterial({
-      size: 0.4,
+      size: 0.38,
       vertexColors: true,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.85,
       blending: THREE.AdditiveBlending
     });
 
@@ -194,7 +362,29 @@
     scene.add(particles);
   }
 
-  // ─── Event Handlers ────────────────────────────────────────────
+  // ─── Responsive Scaling ───────────────────────────────────────────
+  function adjustScale() {
+    if (!container || !textGroup) return;
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    const aspect = width / height;
+
+    if (aspect < 0.8) {
+      // Mobile portrait
+      textGroup.scale.setScalar(0.48);
+      if (pinBadge) pinBadge.scale.setScalar(0.7);
+    } else if (aspect < 1.2) {
+      // Tablet
+      textGroup.scale.setScalar(0.72);
+      if (pinBadge) pinBadge.scale.setScalar(0.85);
+    } else {
+      // Desktop
+      textGroup.scale.setScalar(1.0);
+      if (pinBadge) pinBadge.scale.setScalar(1.0);
+    }
+  }
+
+  // ─── Event Handlers ───────────────────────────────────────────────
   function onWindowResize() {
     if (!container) return;
     const width = container.clientWidth;
@@ -202,13 +392,14 @@
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
+    adjustScale();
   }
 
   function onMouseMove(e) {
     mouseX = (e.clientX / window.innerWidth) * 2 - 1;
     mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-    targetRotationY = mouseX * 0.35;
-    targetRotationX = -mouseY * 0.25;
+    targetRotationY = mouseX * 0.28;
+    targetRotationX = -mouseY * 0.20;
   }
 
   function onWindowScroll() {
@@ -217,47 +408,61 @@
     scrollProgress = Math.min(Math.max(scrollY / heroHeight, 0), 1);
   }
 
-  // ─── Animation Loop ────────────────────────────────────────────
-  let clock = new THREE.Clock();
+  // ─── Render Animation Loop ────────────────────────────────────────
+  const clock = new THREE.Clock();
 
   function animate() {
     requestAnimationFrame(animate);
 
-    const delta = clock.getDelta();
     const elapsedTime = clock.getElapsedTime();
 
-    // Subtle idle floating
+    // 1. Text Group Interactive Tilting & Liquid Wave Motion
     if (textGroup) {
       textGroup.rotation.y += (targetRotationY - textGroup.rotation.y) * 0.05;
       textGroup.rotation.x += (targetRotationX - textGroup.rotation.x) * 0.05;
-      textGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.4;
 
-      // Scroll-driven camera swooping and scale dispersion
-      const targetZ = 32 - scrollProgress * 26; // zooms forward
-      camera.position.z += (targetZ - camera.position.z) * 0.1;
-      camera.position.y = scrollProgress * 5;
-
-      // As user scrolls, disperse letters slightly and fade canvas
+      // Individual kinetic wave bobbing on each of the 9 letters
       textGroup.children.forEach((letter, idx) => {
-        const offset = (idx - 2) * scrollProgress * 2.5;
-        letter.position.z = Math.sin(elapsedTime * 2 + idx) * 0.2 + scrollProgress * 8;
-        letter.rotation.y = Math.sin(elapsedTime + idx) * 0.1;
+        letter.position.y = Math.sin(elapsedTime * 2.2 + idx * 0.42) * 0.38;
+        letter.rotation.y = Math.sin(elapsedTime * 1.5 + idx * 0.3) * 0.06;
       });
-
-      // Fade canvas out when scrolled past hero
-      container.style.opacity = (1 - scrollProgress * 1.3).toString();
-      if (scrollProgress >= 0.98) {
-        container.style.pointerEvents = 'none';
-      } else {
-        container.style.pointerEvents = 'auto';
-      }
     }
 
-    // Particle rotation
+    // 2. Pinterest Pin Badge floating & gentle oscillation
+    if (pinBadge) {
+      pinBadge.position.y = 5.8 + Math.sin(elapsedTime * 2.0) * 0.45;
+      pinBadge.rotation.y = Math.sin(elapsedTime * 1.2) * 0.25;
+      pinBadge.rotation.z = Math.cos(elapsedTime * 1.4) * 0.08;
+    }
+
+    // 3. Floating 3D Cards orbit & wobble
+    floatingCards.forEach((fc) => {
+      fc.group.position.y = fc.baseY + Math.sin(elapsedTime * fc.speed) * 0.6;
+      fc.group.rotation.x = fc.baseRx + Math.sin(elapsedTime * fc.speed * 0.8) * 0.08;
+      fc.group.rotation.y = fc.baseRy + Math.cos(elapsedTime * fc.speed * 0.7) * 0.1;
+    });
+
+    // 4. Particle Vortex Rotation
     if (particles) {
-      particles.rotation.y = elapsedTime * 0.04;
-      particles.rotation.x = elapsedTime * 0.02;
+      particles.rotation.y = elapsedTime * 0.035;
+      particles.rotation.x = elapsedTime * 0.015;
     }
+
+    // 5. Scroll Zoom Effect into Masonry Feed
+    const targetZ = 36 - scrollProgress * 30; // Camera accelerates forward through letters
+    camera.position.z += (targetZ - camera.position.z) * 0.12;
+    camera.position.y = scrollProgress * 6;
+
+    // Disperse cards outward on scroll
+    if (cardsGroup) {
+      cardsGroup.children.forEach((c, idx) => {
+        c.position.z = floatingCards[idx].baseZ + scrollProgress * 18;
+      });
+    }
+
+    // Fade canvas out smoothly when approaching feed
+    container.style.opacity = Math.max(0, 1 - scrollProgress * 1.2).toString();
+    container.style.pointerEvents = scrollProgress >= 0.96 ? 'none' : 'auto';
 
     renderer.render(scene, camera);
   }
