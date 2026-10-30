@@ -15,41 +15,6 @@ A modern full-stack Pinterest Clone featuring an Apple OS-inspired dark glassmor
 
 ---
 
-## 🚀 Quick Start
-
-### 1. Prerequisites
-- [Node.js](https://nodejs.org/) (version 16 or higher)
-- An Unsplash Developer Access Key (free at [unsplash.com/developers](https://unsplash.com/developers))
-
-### 2. Setup Environment
-Copy the example environment file:
-```bash
-cp .env.example .env
-```
-Open `.env` and add your Unsplash key:
-```env
-UNSPLASH_KEY=your_unsplash_access_key_here
-PORT=5000
-```
-
-### 3. Install Dependencies
-```bash
-npm install
-```
-
-### 4. Run the Project
-```bash
-# Start server
-npm start
-
-# Or start in development mode with auto-reload:
-npm run dev
-```
-
-Visit the application in your browser:
-**`http://localhost:5000`**
-
----
 
 ## 🔒 Security
 - Secret environment variables (`.env`) and user account databases are excluded via `.gitignore`.
